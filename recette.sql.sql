@@ -1,3 +1,51 @@
+-- 1. temps de prep decroissant 
+SELECT nom_recette, temps_prep, categorie.nom_categorie
+FROM recette
+INNER JOIN categorie ON recette.id_categorie = categorie.id_categorie
+ORDER BY temps_prep DESC;
+
+-- 2. temps de prep decroissant + nb ingredient par recette 
+SELECT recette.nom_recette, recette.temps_prep, categorie.nom_categorie,
+    COUNT(id_ingredient)
+FROM recette_ingredient
+INNER JOIN recette ON recette.id_recette = recette_ingredient.id_recette
+INNER JOIN categorie ON categorie.id_categorie = recette.id_categorie
+GROUP BY recette.id_recette;
+
+-- 3. recette > 20mn 
+SELECT nom_recette, temps_prep, instructions, categorie.nom_categorie
+FROM recette
+	INNER JOIN categorie ON categorie.id_categorie = recette.id_categorie
+WHERE temps_prep > 20;
+
+-- 4. recette avec le mot 'salade'
+SELECT nom_recette, temps_prep, instructions, categorie.nom_categorie
+FROM recette
+INNER JOIN categorie ON categorie.id_categorie = recette.id_categorie 
+WHERE nom_recette LIKE '%salade%';
+
+-- 5. inserer une nouvelle recette 
+INSERT INTO recette (nom_recette, temps_prep, instructions, id_categorie)
+VALUES ('Poulet à la crème', 20, 'Dans une poêle, fais revenir le poulet en morceaux avec l’oignon. Ajoute la crème, assaisonne.', 2);
+INSERT INTO recette_ingredient (qtt, unite, id_ingredient, id_recette)
+VALUES 
+	(150, 'g', 4, 11),
+	(200, 'g', 29, 11),
+	(100, 'ml', 6, 11),
+	(1, 'p', 26, 11),
+	(1, 'càs', 12, 11);
+	
+-- 6. modifier un nom de recette
+UPDATE recette 
+SET nom_recette = 'Spaguetti au poulet et à la crème'
+WHERE id_recette = 2;
+
+-- 7. supprimer une ligne
+DELETE FROM recette_ingredient
+WHERE id_recette = 2; 
+DELETE FROM recette
+WHERE id_recette = 2;
+
 -- 8. afficher prix total 
 SELECT recette.nom_recette, ROUND(SUM(prix*qtt), 2) 
 FROM ingredient
