@@ -128,3 +128,17 @@ INSERT INTO ingredient (nom_ingredient, unite, prix)
 VALUES ('Banane', 'p', 2.5);
 INSERT INTO recette_ingredient (id_recette, id_ingredient, qtt)
 VALUES (9, LAST_INSERT_ID(), 1);
+
+-- 20. afficher la recette qui coûte la plus chère
+SELECT nom_recette, ROUND(SUM(ingredient.prix*recette_ingredient.qtt), 2) AS prix_total
+FROM recette
+INNER JOIN recette_ingredient ON recette.id_recette = recette_ingredient.id_recette
+INNER JOIN ingredient ON recette_ingredient.id_ingredient = ingredient.id_ingredient
+GROUP BY recette.id_recette
+HAVING prix_total >= ALL (
+	SELECT ROUND(SUM(prix*recette_ingredient.qtt), 2)
+	FROM ingredient 
+	INNER JOIN recette_ingredient ON ingredient.id_ingredient = recette_ingredient.id_ingredient 
+	INNER JOIN recette ON recette_ingredient.id_recette = recette.id_recette
+	GROUP BY recette.id_recette
+);
